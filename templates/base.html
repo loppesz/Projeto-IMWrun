@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}IMW Run{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Nav desktop -->
+  <nav class="nav-desktop">
+    <a href="/" class="nav-logo">🏃 IMW Run</a>
+    <div class="nav-links">
+      <a href="/corridas">Corridas</a>
+      <a href="/ranking">Ranking</a>
+      <a href="/perfil">Perfil</a>
+      <a href="/login" class="btn btn-sm">Entrar</a>
+    </div>
+  </nav>
+
+  <!-- Conteúdo -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Nav mobile (bottom) -->
+  <nav class="nav-mobile">
+    <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+      <span class="nav-icon">🏠</span>
+      <span>Início</span>
+    </a>
+    <a href="/corridas" class="nav-item {% if '/corridas' in request.path %}active{% endif %}">
+      <span class="nav-icon">📅</span>
+      <span>Corridas</span>
+    </a>
+    <a href="/ranking" class="nav-item {% if '/ranking' in request.path %}active{% endif %}">
+      <span class="nav-icon">🏆</span>
+      <span>Ranking</span>
+    </a>
+    <a href="/perfil" class="nav-item {% if '/perfil' in request.path %}active{% endif %}">
+      <span class="nav-icon">👤</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

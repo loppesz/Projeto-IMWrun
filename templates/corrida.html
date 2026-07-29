@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}IMW Run #03 — Inscrição{% endblock %}
+{% block content %}
+
+<section class="hero" style="padding:40px 16px">
+  <div style="position:relative;z-index:1">
+    <a href="/corridas" style="color:rgba(255,255,255,0.7);font-size:0.875rem;display:inline-block;margin-bottom:12px">← Voltar</a>
+    <h1 style="font-size:2rem">IMW Run #03</h1>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:8px;font-size:0.875rem;opacity:0.85">
+      <span>📅 12 Abr 2025</span>
+      <span>🕐 07:00</span>
+      <span>📍 Asa Sul, Brasília/DF</span>
+      <span>📏 5 km</span>
+    </div>
+  </div>
+</section>
+
+<div class="container section">
+
+  <!-- Formulário de inscrição -->
+  <div class="card mb-6 fade-in" id="form-card">
+    <div class="card-header">✍️ Formulário de inscrição</div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Nome completo *</label>
+        <input class="form-input" type="text" id="nome" placeholder="Ex: João da Silva" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone (com DDD) *</label>
+        <input class="form-input" type="tel" id="telefone" placeholder="11 99999-8888" />
+      </div>
+      <div class="grid-2 gap-3">
+        <div class="form-group">
+          <label class="form-label">Idade *</label>
+          <input class="form-input" type="number" id="idade" placeholder="Ex: 30" min="1" max="120" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gênero</label>
+          <select class="form-input" id="genero">
+            <option value="">Selecione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Escolha do grupo -->
+      <div class="form-group">
+        <label class="form-label">Grupo de corrida *</label>
+        <div id="grupos" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px"></div>
+        <div class="form-hint">Largadas de 12 em 12 minutos</div>
+      </div>
+
+      <!-- Aceite -->
+      <div class="form-group">
+        <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px">
+          <input type="checkbox" id="aceite" style="margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--primary)" />
+          <span class="text-sm">Declaro que estou em condições físicas para participar e aceito os termos do IMW Run.</span>
+        </label>
+      </div>
+
+      <div id="erro" class="alert alert-warn hidden"></div>
+      <button class="btn btn-primary w-full" onclick="inscrever()">Confirmar inscrição</button>
+    </div>
+  </div>
+
+  <!-- Sucesso -->
+  <div class="card fade-in hidden" id="sucesso-card">
+    <div class="card-body text-center">
+      <div style="font-size:3.5rem;margin-bottom:12px">🎉</div>
+      <h2 style="font-weight:900;font-size:1.5rem">Inscrição confirmada!</h2>
+      <p class="text-sm text-gray mt-2">Seu número de participante é:</p>
+      <div style="background:var(--primary);border-radius:16px;padding:20px 32px;margin:16px 0;display:inline-block">
+        <span id="num-gerado" style="font-size:2.5rem;font-weight:900;color:white;letter-spacing:4px">#0042</span>
+      </div>
+      <p class="text-sm text-gray">Guarde este número. Você precisará dele no dia da corrida.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">
+        <a href="/login" class="btn btn-primary">Fazer login com meu número</a>
+        <a href="/" class="btn btn-ghost">Voltar ao início</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mapa do percurso -->
+  <div class="card fade-in" id="mapa">
+    <div class="card-header">🗺️ Percurso oficial</div>
+    <div style="background:#e8f0fe;height:280px;display:flex;align-items:center;justify-content:center;border-radius:0 0 16px 16px">
+      <div class="text-center">
+        <div style="font-size:3rem">🗺️</div>
+        <p class="text-gray text-sm mt-2">Mapa do percurso em breve</p>
+      </div>
+    </div>
+    <div style="padding:16px;display:flex;flex-wrap:wrap;gap:16px;font-size:0.875rem">
+      <span>🟢 Largada — Quadra 1</span>
+      <span>📍 Fiscalização — km 2,5</span>
+      <span>💧 Hidratação — km 3,5</span>
+      <span>🔴 Chegada — Quadra 1</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Grupos mock
+const grupos = [
+  { id:'g1', nome:'Grupo A', hora:'07:00', vagas:4, max:6 },
+  { id:'g2', nome:'Grupo B', hora:'07:12', vagas:3, max:6 },
+  { id:'g3', nome:'Grupo C', hora:'07:24', vagas:6, max:6 },
+  { id:'g4', nome:'Grupo D', hora:'07:36', vagas:5, max:6 },
+];
+
+let grupoSel = null;
+const gruposDiv = document.getElementById('grupos');
+
+grupos.forEach(g => {
+  const cheio = g.vagas === 0;
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-ghost';
+  btn.id = 'g-' + g.id;
+  btn.style = `border:2px solid #e5e7eb;flex-direction:column;gap:2px;padding:10px;${cheio?'opacity:0.4;cursor:not-allowed':''}`;
+  btn.disabled = cheio;
+  btn.innerHTML = `<strong>${g.nome}</strong><span style="font-size:0.72rem;color:var(--gray)">${g.hora} · ${g.max - g.vagas}/${g.max}</span>`;
+  btn.onclick = () => {
+    document.querySelectorAll('[id^=g-]').forEach(b => {
+      b.style.borderColor = '#e5e7eb';
+      b.style.background = '';
+      b.style.color = '';
+    });
+    btn.style.borderColor = 'var(--primary)';
+    btn.style.background = 'rgba(30,64,175,0.05)';
+    btn.style.color = 'var(--primary)';
+    grupoSel = g.id;
+  };
+  gruposDiv.appendChild(btn);
+});
+
+let contador = 42;
+function inscrever() {
+  const nome = document.getElementById('nome').value.trim();
+  const tel  = document.getElementById('telefone').value.replace(/\D/g,'');
+  const idade = parseInt(document.getElementById('idade').value);
+  const aceite = document.getElementById('aceite').checked;
+  const erro = document.getElementById('erro');
+
+  if (!nome || nome.length < 2) { erro.textContent='Nome inválido.'; erro.classList.remove('hidden'); return; }
+  if (tel.length < 10) { erro.textContent='Telefone inválido.'; erro.classList.remove('hidden'); return; }
+  if (!idade || idade < 1 || idade > 120) { erro.textContent='Idade inválida.'; erro.classList.remove('hidden'); return; }
+  if (!grupoSel) { erro.textContent='Escolha um grupo.'; erro.classList.remove('hidden'); return; }
+  if (!aceite) { erro.textContent='Aceite os termos para prosseguir.'; erro.classList.remove('hidden'); return; }
+
+  erro.classList.add('hidden');
+  contador++;
+  document.getElementById('num-gerado').textContent = '#' + String(contador).padStart(4,'0');
+  document.getElementById('form-card').classList.add('hidden');
+  document.getElementById('sucesso-card').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}IMW Run — Corra. Supere. Faça parte da missão.{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="hero-tag">🏃 IMW Run 2025</div>
+    <h1>Corra. Supere seus limites.<br><span>Faça parte da missão.</span></h1>
+    <p>12 corridas de 5 km · Uma jornada de fé, saúde e comunidade.</p>
+    <div class="hero-actions">
+      <a href="/corrida/3" class="btn btn-secondary">✍️ Inscreva-se</a>
+      <a href="/corridas" class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:white">📅 Ver corridas</a>
+    </div>
+  </div>
+</section>
+
+<div class="container section">
+
+  <!-- Próxima corrida -->
+  <div class="card mb-6 fade-in">
+    <div class="card-header" style="background:#fffbeb;color:#92400e;border-bottom-color:#fef3c7">
+      <span class="pulsing" style="display:inline-block;margin-right:6px">🟡</span>
+      Próxima corrida — inscrições abertas
+    </div>
+    <div class="card-body">
+      <h2 style="font-size:1.25rem;font-weight:800;margin-bottom:12px">IMW Run #03</h2>
+      <div class="grid-2 gap-3" style="margin-bottom:16px">
+        <div style="background:#f9fafb;border-radius:12px;padding:10px 14px;font-size:0.875rem;color:#374151">📅 12 de Abril de 2025</div>
+        <div style="background:#f9fafb;border-radius:12px;padding:10px 14px;font-size:0.875rem;color:#374151">🕐 às 07:00</div>
+        <div style="background:#f9fafb;border-radius:12px;padding:10px 14px;font-size:0.875rem;color:#374151">📍 Asa Sul, Brasília/DF</div>
+        <div style="background:#f9fafb;border-radius:12px;padding:10px 14px;font-size:0.875rem;color:#374151">📏 5 km</div>
+      </div>
+      <div class="flex gap-3">
+        <a href="/corrida/3" class="btn btn-primary" style="flex:1">✍️ Inscreva-se</a>
+        <a href="/corrida/3#mapa" class="btn btn-outline" style="flex:1">🗺️ Ver percurso</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-3 mb-6 fade-in">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value">47</div>
+      <div class="stat-label">Participantes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">2</div>
+      <div class="stat-label">Corridas feitas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value">4</div>
+      <div class="stat-label">Grupos ativos</div>
+    </div>
+  </div>
+
+  <!-- Sua jornada -->
+  <div class="card mb-6 fade-in">
+    <div class="card-header">🏅 Jornada 2025 — 12 Corridas</div>
+    <div class="card-body">
+      <div class="journey-grid" id="journey">
+        <!-- Gerado pelo JS -->
+      </div>
+      <div class="mt-4">
+        <div class="flex justify-between text-sm text-gray mb-2">
+          <span>Seu progresso</span><span id="journey-pct">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="journey-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <p class="text-xs text-gray text-center mt-4">
+        <a href="/login" style="color:var(--primary);font-weight:600">Faça login</a> para ver seu progresso pessoal
+      </p>
+    </div>
+  </div>
+
+  <!-- Doação -->
+  <div class="card mb-6 fade-in" style="background:linear-gradient(135deg,#fffbeb,#fff7ed)">
+    <div class="card-body">
+      <div class="flex gap-4 items-center">
+        <div style="background:var(--secondary);border-radius:14px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">🥫</div>
+        <div>
+          <h3 style="font-weight:800;margin-bottom:4px">Doe um alimento</h3>
+          <p class="text-sm text-gray">Traga 1 kg de alimento não perecível no dia da corrida. Toda arrecadação vai para famílias atendidas pela nossa igreja.</p>
+        </div>
+      </div>
+      <div class="grid-3 mt-4" style="gap:8px;text-align:center">
+        <div style="background:white;border-radius:12px;padding:10px">🍚<div style="font-size:0.72rem;color:var(--gray);margin-top:2px">Arroz</div></div>
+        <div style="background:white;border-radius:12px;padding:10px">🫘<div style="font-size:0.72rem;color:var(--gray);margin-top:2px">Feijão</div></div>
+        <div style="background:white;border-radius:12px;padding:10px">🛢️<div style="font-size:0.72rem;color:var(--gray);margin-top:2px">Óleo</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Jornada mock (0 concluídas, não autenticado)
+  const completed = 0;
+  const grid = document.getElementById('journey');
+  for (let i = 1; i <= 12; i++) {
+    const state = i <= completed ? 'done' : (i === completed + 1 ? 'open' : 'locked');
+    const icon  = state === 'done' ? '✅' : (state === 'open' ? '🔓' : '🔒');
+    grid.innerHTML += `
+      <div class="journey-item">
+        <div class="journey-circle ${state}">${icon}</div>
+        <span class="journey-num">#${String(i).padStart(2,'0')}</span>
+      </div>`;
+  }
+  const pct = Math.round(completed/12*100);
+  document.getElementById('journey-pct').textContent = pct + '%';
+  document.getElementById('journey-bar').style.width = pct + '%';
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Dashboard — Admin IMW Run{% endblock %}
+{% block content %}
+
+<div class="admin-header">
+  <h1 class="admin-title">Dashboard</h1>
+  <p class="admin-subtitle">Visão geral — IMW Run 2025</p>
+</div>
+
+<!-- Stats -->
+<div class="grid-4 mb-6" style="gap:16px">
+  <div style="background:#1f2937;border-radius:16px;overflow:hidden">
+    <div style="background:#3b82f6;padding:14px 20px;font-size:1.5rem">👥</div>
+    <div style="padding:14px 20px">
+      <div style="font-size:2rem;font-weight:800;color:white">47</div>
+      <div style="font-size:0.75rem;color:#9ca3af">Participantes</div>
+    </div>
+  </div>
+  <div style="background:#1f2937;border-radius:16px;overflow:hidden">
+    <div style="background:#10b981;padding:14px 20px;font-size:1.5rem">✅</div>
+    <div style="padding:14px 20px">
+      <div style="font-size:2rem;font-weight:800;color:white">89</div>
+      <div style="font-size:0.75rem;color:#9ca3af">Corridas concluídas</div>
+    </div>
+  </div>
+  <div style="background:#1f2937;border-radius:16px;overflow:hidden">
+    <div style="background:#f59e0b;padding:14px 20px;font-size:1.5rem">📏</div>
+    <div style="padding:14px 20px">
+      <div style="font-size:2rem;font-weight:800;color:white">445</div>
+      <div style="font-size:0.75rem;color:#9ca3af">Km registrados</div>
+    </div>
+  </div>
+  <div style="background:#1f2937;border-radius:16px;overflow:hidden">
+    <div style="background:#ef4444;padding:14px 20px;font-size:1.5rem">⚠️</div>
+    <div style="padding:14px 20px">
+      <div style="font-size:2rem;font-weight:800;color:white">3</div>
+      <div style="font-size:0.75rem;color:#9ca3af">Pendentes revisão</div>
+    </div>
+  </div>
+</div>
+
+<!-- Links rápidos -->
+<div class="grid-2 mb-6" style="gap:16px">
+  <a href="/admin/ao-vivo" style="background:linear-gradient(135deg,#059669,#047857);border-radius:16px;padding:20px;display:block;text-decoration:none">
+    <div style="font-size:2rem;margin-bottom:8px">🔴</div>
+    <div style="font-size:1.1rem;font-weight:800;color:white">Painel Ao Vivo</div>
+    <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:4px">Gerenciar largada e chegadas</div>
+  </a>
+  <a href="/admin/grupos" style="background:linear-gradient(135deg,#1d4ed8,#1e40af);border-radius:16px;padding:20px;display:block;text-decoration:none">
+    <div style="font-size:2rem;margin-bottom:8px">👥</div>
+    <div style="font-size:1.1rem;font-weight:800;color:white">Grupos</div>
+    <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:4px">4 grupos ativos esta corrida</div>
+  </a>
+</div>
+
+<!-- Inscrições recentes -->
+<div style="background:#1f2937;border-radius:16px;overflow:hidden">
+  <div style="padding:16px 20px;border-bottom:1px solid #374151;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-weight:700;color:white">📋 Inscrições recentes</span>
+    <a href="/admin/inscritos" style="font-size:0.8rem;color:#60a5fa">Ver todos →</a>
+  </div>
+  <div style="overflow-x:auto">
+    <table style="background:transparent">
+      <thead style="background:transparent">
+        <tr><th style="color:#6b7280">Nº</th><th style="color:#6b7280">Nome</th><th style="color:#6b7280">Grupo</th><th style="color:#6b7280">Data</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span style="background:#1e40af;color:white;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:700">#0047</span></td><td style="color:white">Fernanda Costa</td><td style="color:#9ca3af">Grupo A</td><td style="color:#9ca3af">10 Abr</td></tr>
+        <tr><td><span style="background:#1e40af;color:white;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:700">#0046</span></td><td style="color:white">Bruno Martins</td><td style="color:#9ca3af">Grupo B</td><td style="color:#9ca3af">09 Abr</td></tr>
+        <tr><td><span style="background:#1e40af;color:white;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:700">#0045</span></td><td style="color:white">Aline Souza</td><td style="color:#9ca3af">Grupo A</td><td style="color:#9ca3af">09 Abr</td></tr>
+        <tr><td><span style="background:#1e40af;color:white;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:700">#0044</span></td><td style="color:white">Ricardo Lima</td><td style="color:#9ca3af">Grupo C</td><td style="color:#9ca3af">08 Abr</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

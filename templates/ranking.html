@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Ranking — IMW Run{% endblock %}
+{% block content %}
+
+<section class="hero" style="padding:40px 16px">
+  <div style="position:relative;z-index:1">
+    <div class="hero-tag">🏆 IMW Run 2025</div>
+    <h1 style="font-size:2rem">Ranking</h1>
+    <p>Classificação individual por corridas concluídas</p>
+  </div>
+</section>
+
+<div class="container section">
+
+  <!-- Top 3 -->
+  <div class="grid-3 mb-6" id="top3"></div>
+
+  <!-- Filtros -->
+  <div class="filter-chips mb-4" id="filtros">
+    <button class="chip active" data-f="geral">🌐 Geral</button>
+    <button class="chip" data-f="M">♂ Masculino</button>
+    <button class="chip" data-f="F">♀ Feminino</button>
+    <button class="chip" data-f="18-29">18–29</button>
+    <button class="chip" data-f="30-39">30–39</button>
+    <button class="chip" data-f="40-49">40–49</button>
+    <button class="chip" data-f="50+">50+</button>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Corridas</th>
+            <th>Km</th>
+            <th>Melhor tempo</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-xs text-gray text-center mt-4">Atualizado após cada corrida concluída</p>
+
+</div>
+
+<script>
+const dados = [
+  { pos:1, nome:'Carlos Eduardo', corridas:2, km:10.2, tempo:'28:14', genero:'M', faixa:'30-39' },
+  { pos:2, nome:'Ana Lima',        corridas:2, km:9.8,  tempo:'30:02', genero:'F', faixa:'18-29' },
+  { pos:3, nome:'Roberto Silva',   corridas:2, km:9.5,  tempo:'32:44', genero:'M', faixa:'40-49' },
+  { pos:4, nome:'Maria Fernanda',  corridas:1, km:5.1,  tempo:'33:10', genero:'F', faixa:'30-39' },
+  { pos:5, nome:'João Pedro',      corridas:1, km:5.0,  tempo:'35:22', genero:'M', faixa:'18-29' },
+  { pos:6, nome:'Patrícia Gomes',  corridas:1, km:4.9,  tempo:'38:44', genero:'F', faixa:'50+' },
+  { pos:7, nome:'Marcos Antonio',  corridas:1, km:4.8,  tempo:'41:02', genero:'M', faixa:'40-49' },
+  { pos:8, nome:'Luciana Torres',  corridas:1, km:4.7,  tempo:'42:15', genero:'F', faixa:'18-29' },
+];
+
+const medals = ['🥇','🥈','🥉'];
+
+// Top 3
+const top3 = document.getElementById('top3');
+dados.slice(0,3).forEach((p,i) => {
+  const cores = ['#fef3c7','#f3f4f6','#fff7ed'];
+  const bordas = ['#f59e0b','#9ca3af','#fb923c'];
+  top3.innerHTML += `
+    <div class="stat-card" style="border:2px solid ${bordas[i]};background:${cores[i]}">
+      <div style="font-size:2rem">${medals[i]}</div>
+      <div style="font-weight:800;font-size:0.95rem;margin:4px 0">${p.nome.split(' ')[0]}</div>
+      <div style="font-size:0.75rem;color:var(--gray)">${p.corridas} corridas · ${p.km} km</div>
+    </div>`;
+});
+
+// Tabela
+let filtro = 'geral';
+
+function renderTabela() {
+  const body = document.getElementById('ranking-body');
+  const filtrados = dados.filter(p => {
+    if (filtro === 'geral') return true;
+    if (filtro === 'M' || filtro === 'F') return p.genero === filtro;
+    return p.faixa === filtro;
+  });
+
+  body.innerHTML = filtrados.length === 0
+    ? `<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:24px">Nenhum resultado para este filtro</td></tr>`
+    : filtrados.map((p, i) => `
+        <tr>
+          <td><strong style="color:var(--gray)">${medals[i] ?? i+1}</strong></td>
+          <td><strong>${p.nome}</strong></td>
+          <td style="color:var(--primary);font-weight:700">${p.corridas}</td>
+          <td>${p.km} km</td>
+          <td style="font-family:monospace">${p.tempo}</td>
+        </tr>`).join('');
+}
+
+document.querySelectorAll('.chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtro = btn.dataset.f;
+    renderTabela();
+  });
+});
+
+renderTabela();
+</script>
+{% endblock %}

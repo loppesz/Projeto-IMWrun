@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Perfil — IMW Run{% endblock %}
+{% block content %}
+
+<!-- Header do perfil -->
+<div style="background:linear-gradient(135deg,var(--primary),#1e3a8a);color:white;padding:40px 16px 32px">
+  <div class="container">
+    <div class="flex gap-4 items-center">
+      <div style="width:64px;height:64px;background:rgba(255,255,255,0.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">👤</div>
+      <div>
+        <h1 style="font-size:1.5rem;font-weight:900">Carlos Eduardo</h1>
+        <p style="opacity:0.8;font-size:0.875rem">#0001 · Grupo A · 2/12 corridas</p>
+      </div>
+    </div>
+    <!-- Progress -->
+    <div style="margin-top:20px">
+      <div class="flex justify-between text-sm" style="margin-bottom:6px;opacity:0.85">
+        <span>Progresso da jornada</span><span style="font-weight:700">17%</span>
+      </div>
+      <div style="height:10px;background:rgba(255,255,255,0.2);border-radius:100px;overflow:hidden">
+        <div style="height:100%;width:17%;background:var(--secondary);border-radius:100px;transition:width 0.7s"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container section">
+
+  <!-- Stats -->
+  <div class="grid-3 mb-6">
+    <div class="stat-card"><div class="stat-icon">🏁</div><div class="stat-value">2/12</div><div class="stat-label">Corridas</div></div>
+    <div class="stat-card"><div class="stat-icon">📏</div><div class="stat-value">10.4 km</div><div class="stat-label">Total</div></div>
+    <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value">2</div><div class="stat-label">Sequência</div></div>
+  </div>
+
+  <!-- Jornada -->
+  <div class="card mb-6">
+    <div class="card-header">🏅 Sua jornada</div>
+    <div class="card-body">
+      <div class="journey-grid" id="journey"></div>
+    </div>
+  </div>
+
+  <!-- Conquistas -->
+  <div class="card mb-6">
+    <div class="card-header">🏆 Conquistas desbloqueadas</div>
+    <div class="card-body" id="conquistas-on"></div>
+  </div>
+
+  <!-- Conquistas bloqueadas -->
+  <div class="card mb-6">
+    <div class="card-header" style="color:var(--gray)">🔒 Próximas conquistas</div>
+    <div class="card-body" id="conquistas-off"></div>
+  </div>
+
+  <!-- CTA -->
+  <div style="background:#fffbeb;border-radius:var(--radius);padding:20px;text-align:center">
+    <p style="font-weight:700">Próxima corrida disponível!</p>
+    <p class="text-sm text-gray mt-1">IMW Run #03 — 12 Abr 2025 às 07:00</p>
+    <a href="/corrida/3" class="btn btn-secondary" style="margin-top:12px">Ver detalhes →</a>
+  </div>
+
+</div>
+
+<script>
+// Jornada (2 concluídas)
+const completed = 2;
+const grid = document.getElementById('journey');
+for (let i = 1; i <= 12; i++) {
+  const state = i <= completed ? 'done' : (i === completed+1 ? 'open' : 'locked');
+  const icon  = state === 'done' ? '✅' : (state === 'open' ? '🔓' : '🔒');
+  grid.innerHTML += `<div class="journey-item"><div class="journey-circle ${state}">${icon}</div><span class="journey-num">#${String(i).padStart(2,'0')}</span></div>`;
+}
+
+// Conquistas
+const on = [
+  { icon:'🏃', nome:'Primeira Corrida', desc:'Completou a primeira corrida', data:'15 Fev 2025' },
+  { icon:'🔥', nome:'Sequência de 2',   desc:'Completou 2 corridas consecutivas', data:'15 Mar 2025' },
+];
+
+const off = [
+  { icon:'🔥', nome:'Sequência de 3',   desc:'Complete 3 corridas consecutivas' },
+  { icon:'⚡', nome:'Sequência de 6',   desc:'Complete 6 corridas consecutivas' },
+  { icon:'🏆', nome:'IMW RUN 12/12',    desc:'Complete todas as 12 corridas' },
+  { icon:'💎', nome:'Sequência completa', desc:'Complete as 12 sem faltar nenhuma' },
+];
+
+const conquOn = document.getElementById('conquistas-on');
+on.forEach(c => {
+  conquOn.innerHTML += `
+    <div style="display:flex;gap:12px;align-items:center;background:rgba(30,64,175,0.04);border-radius:14px;padding:14px;margin-bottom:10px">
+      <div style="width:48px;height:48px;background:rgba(30,64,175,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">${c.icon}</div>
+      <div><p style="font-weight:700;font-size:0.875rem">${c.nome}</p><p style="font-size:0.75rem;color:var(--gray)">${c.desc}</p><p style="font-size:0.7rem;color:var(--gray);margin-top:2px">🗓 ${c.data}</p></div>
+    </div>`;
+});
+
+const conquOff = document.getElementById('conquistas-off');
+off.forEach(c => {
+  conquOff.innerHTML += `
+    <div style="display:flex;gap:12px;align-items:center;background:#f9fafb;border-radius:14px;padding:14px;margin-bottom:10px;opacity:0.6">
+      <div style="width:48px;height:48px;background:#e5e7eb;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;filter:grayscale(1)">${c.icon}</div>
+      <div><p style="font-weight:700;font-size:0.875rem;color:var(--gray)">🔒 ${c.nome}</p><p style="font-size:0.75rem;color:var(--gray)">${c.desc}</p></div>
+    </div>`;
+});
+</script>
+{% endblock %}
