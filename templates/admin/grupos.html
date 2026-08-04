@@ -1,0 +1,70 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Grupos — Admin IMW Run{% endblock %}
+{% block content %}
+
+<div class="admin-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1 class="admin-title">👥 Grupos</h1>
+    <p class="admin-subtitle">IMW Run #03 · 4 grupos · Largadas de 12 em 12 min</p>
+  </div>
+  <a href="/admin/ao-vivo" class="btn btn-secondary btn-sm">🔴 Ir ao vivo</a>
+</div>
+
+<div id="grupos-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
+
+<script>
+const grupos = [
+  { id:'g1', nome:'Grupo A', horario:'07:00', max:6, membros:[
+    { num:'0001', nome:'Carlos Eduardo', presente:true  },
+    { num:'0002', nome:'Ana Lima',        presente:true  },
+    { num:'0003', nome:'João Pedro',      presente:false },
+  ]},
+  { id:'g2', nome:'Grupo B', horario:'07:12', max:6, membros:[
+    { num:'0004', nome:'Roberto Silva',  presente:true  },
+    { num:'0005', nome:'Maria Fernanda', presente:true  },
+    { num:'0006', nome:'Patrícia Gomes', presente:true  },
+  ]},
+  { id:'g3', nome:'Grupo C', horario:'07:24', max:6, membros:[
+    { num:'0007', nome:'Marcos Antonio',   presente:false },
+    { num:'0008', nome:'Luciana Torres',   presente:false },
+    { num:'0009', nome:'André Nascimento', presente:false },
+  ]},
+  { id:'g4', nome:'Grupo D', horario:'07:36', max:6, membros:[
+    { num:'0010', nome:'Sandra Moura',   presente:false },
+    { num:'0011', nome:'Tiago Almeida',  presente:false },
+    { num:'0012', nome:'Fernanda Costa', presente:false },
+  ]},
+];
+
+const grid = document.getElementById('grupos-grid');
+grupos.forEach(g => {
+  const presentes = g.membros.filter(m=>m.presente).length;
+  const membrosHtml = g.membros.map(m => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #374151">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:0.8rem">${m.presente?'✅':'⬜'}</span>
+        <span style="color:white;font-size:0.875rem">${m.nome}</span>
+      </div>
+      <span style="font-size:0.72rem;color:#9ca3af">#${m.num}</span>
+    </div>`).join('');
+
+  grid.innerHTML += `
+    <div style="background:#1f2937;border-radius:16px;overflow:hidden">
+      <div style="background:#374151;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <p style="font-weight:800;color:white">${g.nome}</p>
+          <p style="font-size:0.75rem;color:#9ca3af">⏰ ${g.horario} · ${presentes}/${g.membros.length} confirmados · ${g.max-g.membros.length} vagas</p>
+        </div>
+        <button onclick="alert('Vá para o painel Ao Vivo para iniciar a corrida')" style="background:#10b981;color:white;border:none;border-radius:10px;padding:6px 14px;font-weight:700;font-size:0.78rem;cursor:pointer">
+          🚀 Iniciar
+        </button>
+      </div>
+      <div style="padding:0 20px">${membrosHtml}</div>
+      <div style="padding:12px 20px;border-top:1px solid #374151;display:flex;gap:8px">
+        <button style="background:#374151;border:none;border-radius:8px;padding:6px 12px;color:#9ca3af;font-size:0.75rem;cursor:pointer">+ Adicionar membro</button>
+        <button style="background:#374151;border:none;border-radius:8px;padding:6px 12px;color:#9ca3af;font-size:0.75rem;cursor:pointer">✏️ Editar horário</button>
+      </div>
+    </div>`;
+});
+</script>
+{% endblock %}

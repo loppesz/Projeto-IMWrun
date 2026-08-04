@@ -1,0 +1,91 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Inscritos — Admin IMW Run{% endblock %}
+{% block content %}
+
+<div class="admin-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1 class="admin-title">📋 Inscritos</h1>
+    <p class="admin-subtitle" id="subtitulo">IMW Run #03 · 47 participantes</p>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <select id="sel-corrida" style="background:#374151;color:white;border:1px solid #4b5563;border-radius:10px;padding:8px 12px;font-size:0.8rem" onchange="filtrarCorrida()">
+      <option value="3">IMW Run #03</option>
+      <option value="2">IMW Run #02</option>
+      <option value="1">IMW Run #01</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="exportarCSV()">⬇️ Exportar CSV</button>
+  </div>
+</div>
+
+<!-- Busca -->
+<div style="margin-bottom:16px">
+  <input id="busca" class="form-input" style="background:#1f2937;border-color:#374151;color:white;max-width:320px" placeholder="🔍 Buscar por nome ou número..." oninput="filtrar()" />
+</div>
+
+<div style="background:#1f2937;border-radius:16px;overflow:hidden">
+  <div style="overflow-x:auto">
+    <table style="background:transparent">
+      <thead><tr>
+        <th style="color:#6b7280">Nº</th>
+        <th style="color:#6b7280">Nome</th>
+        <th style="color:#6b7280">Telefone</th>
+        <th style="color:#6b7280">Idade</th>
+        <th style="color:#6b7280">Grupo</th>
+        <th style="color:#6b7280">Data</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div id="empty" style="display:none;padding:32px;text-align:center;color:#6b7280">Nenhum resultado encontrado</div>
+</div>
+
+<script>
+const inscritos = [
+  { num:'0001', nome:'Carlos Eduardo',  tel:'61 99999-1111', idade:34, grupo:'Grupo A', data:'10 Jan 2025' },
+  { num:'0002', nome:'Ana Lima',         tel:'61 99999-2222', idade:27, grupo:'Grupo A', data:'11 Jan 2025' },
+  { num:'0003', nome:'João Pedro',       tel:'61 99999-3333', idade:22, grupo:'Grupo A', data:'12 Jan 2025' },
+  { num:'0004', nome:'Roberto Silva',    tel:'61 99999-4444', idade:45, grupo:'Grupo B', data:'12 Jan 2025' },
+  { num:'0005', nome:'Maria Fernanda',   tel:'61 99999-5555', idade:31, grupo:'Grupo B', data:'13 Jan 2025' },
+  { num:'0006', nome:'Patrícia Gomes',   tel:'61 99999-6666', idade:53, grupo:'Grupo B', data:'13 Jan 2025' },
+  { num:'0007', nome:'Marcos Antonio',   tel:'61 99999-7777', idade:41, grupo:'Grupo C', data:'14 Jan 2025' },
+  { num:'0008', nome:'Luciana Torres',   tel:'61 99999-8888', idade:29, grupo:'Grupo C', data:'14 Jan 2025' },
+  { num:'0009', nome:'André Nascimento', tel:'61 99999-9999', idade:62, grupo:'Grupo C', data:'15 Jan 2025' },
+  { num:'0010', nome:'Sandra Moura',     tel:'61 98888-0000', idade:38, grupo:'Grupo D', data:'15 Jan 2025' },
+  { num:'0011', nome:'Tiago Almeida',    tel:'61 98888-1111', idade:26, grupo:'Grupo D', data:'16 Jan 2025' },
+  { num:'0012', nome:'Fernanda Costa',   tel:'61 98888-2222', idade:33, grupo:'Grupo D', data:'16 Jan 2025' },
+];
+
+function renderTabela(lista) {
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('empty');
+  if (lista.length === 0) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = lista.map(p => `
+    <tr>
+      <td><span style="background:#1e40af;color:white;padding:2px 8px;border-radius:8px;font-size:0.75rem;font-weight:700">#${p.num}</span></td>
+      <td style="color:white;font-weight:600">${p.nome}</td>
+      <td style="color:#9ca3af">${p.tel}</td>
+      <td style="color:#9ca3af">${p.idade} anos</td>
+      <td><span class="badge badge-blue">${p.grupo}</span></td>
+      <td style="color:#9ca3af">${p.data}</td>
+    </tr>`).join('');
+}
+
+function filtrar() {
+  const q = document.getElementById('busca').value.toLowerCase();
+  renderTabela(inscritos.filter(p => p.nome.toLowerCase().includes(q) || p.num.includes(q)));
+}
+
+function filtrarCorrida() { renderTabela(inscritos); }
+
+function exportarCSV() {
+  const header = 'Número,Nome,Telefone,Idade,Grupo,Data\n';
+  const rows = inscritos.map(p => `${p.num},${p.nome},${p.tel},${p.idade},${p.grupo},${p.data}`).join('\n');
+  const blob = new Blob([header+rows], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'inscritos-imw-run-03.csv'; a.click();
+}
+
+renderTabela(inscritos);
+</script>
+{% endblock %}

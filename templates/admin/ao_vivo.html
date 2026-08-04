@@ -1,0 +1,220 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Ao Vivo — Admin IMW Run{% endblock %}
+{% block content %}
+
+<div class="admin-header">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="admin-title">🔴 Painel Ao Vivo</h1>
+      <p class="admin-subtitle">IMW Run #03 — 12 Abr 2025 · Asa Sul</p>
+    </div>
+    <div id="status-geral" style="background:#374151;border-radius:12px;padding:10px 16px;font-size:0.875rem;color:#9ca3af">
+      ⏳ Aguardando largada
+    </div>
+  </div>
+</div>
+
+<!-- Largada geral -->
+<div style="background:#1f2937;border-radius:16px;padding:20px;margin-bottom:24px" id="largada-geral-box">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <p style="font-weight:700;color:white;margin-bottom:4px">🚀 Largada Geral</p>
+      <p style="font-size:0.8rem;color:#9ca3af">Inicia todos os grupos ao mesmo tempo</p>
+    </div>
+    <button class="btn btn-secondary" onclick="largadaGeral()" id="btn-largada-geral">
+      🏁 Disparar largada geral
+    </button>
+  </div>
+</div>
+
+<!-- Grupos -->
+<div id="grupos-container" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px"></div>
+
+<!-- Ranking em tempo real -->
+<div style="background:#1f2937;border-radius:16px;overflow:hidden" id="ranking-box" style="display:none">
+  <div style="padding:16px 20px;border-bottom:1px solid #374151;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-weight:700;color:white">🏆 Ranking ao vivo (tempo líquido)</span>
+    <span id="chegadas-count" style="font-size:0.8rem;color:#9ca3af">0 chegadas</span>
+  </div>
+  <div style="overflow-x:auto">
+    <table style="background:transparent">
+      <thead><tr>
+        <th style="color:#6b7280">#</th>
+        <th style="color:#6b7280">Nome</th>
+        <th style="color:#6b7280">Grupo</th>
+        <th style="color:#6b7280">Tempo</th>
+      </tr></thead>
+      <tbody id="ranking-live"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const grupos = [
+  { id:'g1', nome:'Grupo A', horario:'07:00', membros:[
+    { id:'m1', num:'0001', nome:'Carlos Eduardo' },
+    { id:'m2', num:'0002', nome:'Ana Lima' },
+    { id:'m3', num:'0003', nome:'João Pedro' },
+  ]},
+  { id:'g2', nome:'Grupo B', horario:'07:12', membros:[
+    { id:'m4', num:'0004', nome:'Roberto Silva' },
+    { id:'m5', num:'0005', nome:'Maria Fernanda' },
+    { id:'m6', num:'0006', nome:'Patrícia Gomes' },
+  ]},
+  { id:'g3', nome:'Grupo C', horario:'07:24', membros:[
+    { id:'m7', num:'0007', nome:'Marcos Antonio' },
+    { id:'m8', num:'0008', nome:'Luciana Torres' },
+    { id:'m9', num:'0009', nome:'André Nascimento' },
+  ]},
+  { id:'g4', nome:'Grupo D', horario:'07:36', membros:[
+    { id:'m10', num:'0010', nome:'Sandra Moura' },
+    { id:'m11', num:'0011', nome:'Tiago Almeida' },
+    { id:'m12', num:'0012', nome:'Fernanda Costa' },
+  ]},
+];
+
+// Estado
+const state = {};
+grupos.forEach(g => {
+  state[g.id] = { startedAt: null, membros: {} };
+  g.membros.forEach(m => {
+    state[g.id].membros[m.id] = { presente: false, chegada: null };
+  });
+});
+
+let tickInterval = null;
+
+function fmt(s) {
+  const m = Math.floor(s/60).toString().padStart(2,'0');
+  const sec = (s%60).toString().padStart(2,'0');
+  return m+':'+sec;
+}
+
+function elapsed(ts) { return Math.floor((Date.now()-ts)/1000); }
+
+function renderGrupos() {
+  const container = document.getElementById('grupos-container');
+  container.innerHTML = '';
+  grupos.forEach(g => {
+    const gs = state[g.id];
+    const running = gs.startedAt !== null;
+    const elap = running ? elapsed(gs.startedAt) : 0;
+    const presentes = g.membros.filter(m => gs.membros[m.id].presente).length;
+    const chegadas = g.membros.filter(m => gs.membros[m.id].chegada !== null).length;
+
+    const membrosHtml = g.membros.map(m => {
+      const ms = gs.membros[m.id];
+      const chegou = ms.chegada !== null;
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #374151">
+          <div style="display:flex;align-items:center;gap:10px">
+            ${running ? '' : `<button onclick="togglePresente('${g.id}','${m.id}')" style="width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;font-size:0.9rem;background:${ms.presente?'#10b981':'#374151'};color:white">${ms.presente?'✓':'?'}</button>`}
+            ${running ? `<span style="font-size:1rem">${chegou?'✅':ms.presente?'🏃':'—'}</span>` : ''}
+            <div>
+              <p style="font-size:0.875rem;font-weight:600;color:white">${m.nome}</p>
+              <p style="font-size:0.72rem;color:#9ca3af">#${m.num}</p>
+            </div>
+          </div>
+          <div>
+            ${chegou
+              ? `<span style="font-family:monospace;font-weight:700;color:#10b981">${fmt(ms.chegada)}</span>`
+              : running && ms.presente
+              ? `<button onclick="registrarChegada('${g.id}','${m.id}')" style="background:#f59e0b;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.75rem;font-weight:700;cursor:pointer">🏁 Chegou</button>`
+              : '<span style="color:#4b5563;font-size:0.8rem">—</span>'
+            }
+          </div>
+        </div>`;
+    }).join('');
+
+    container.innerHTML += `
+      <div style="background:#1f2937;border-radius:16px;overflow:hidden;${running?'outline:2px solid #10b981':''}">
+        <div style="background:${running?'#064e3b':'#374151'};padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <p style="font-weight:800;color:white">${g.nome}</p>
+            <p style="font-size:0.75rem;color:#9ca3af">⏰ ${g.horario} · ${presentes}/${g.membros.length} presentes</p>
+          </div>
+          <div style="text-align:right">
+            ${running
+              ? `<div id="timer-${g.id}" style="font-size:1.5rem;font-weight:900;font-family:monospace;color:#10b981">${fmt(elap)}</div>
+                 <div style="font-size:0.72rem;color:#9ca3af">${chegadas}/${g.membros.length} chegaram</div>`
+              : `<button onclick="iniciarGrupo('${g.id}')" style="background:#10b981;color:white;border:none;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:0.8rem">🚀 Iniciar</button>`
+            }
+          </div>
+        </div>
+        <div style="padding:0 20px">${membrosHtml}</div>
+      </div>`;
+  });
+}
+
+function iniciarGrupo(gid) {
+  state[gid].startedAt = Date.now();
+  if (!tickInterval) startTick();
+  renderGrupos();
+  renderRanking();
+  atualizaStatusGeral();
+}
+
+function largadaGeral() {
+  const now = Date.now();
+  grupos.forEach(g => { if (!state[g.id].startedAt) state[g.id].startedAt = now; });
+  document.getElementById('btn-largada-geral').disabled = true;
+  document.getElementById('btn-largada-geral').textContent = '✅ Largada disparada';
+  if (!tickInterval) startTick();
+  renderGrupos();
+  atualizaStatusGeral();
+}
+
+function togglePresente(gid, mid) {
+  state[gid].membros[mid].presente = !state[gid].membros[mid].presente;
+  renderGrupos();
+}
+
+function registrarChegada(gid, mid) {
+  const secs = elapsed(state[gid].startedAt);
+  state[gid].membros[mid].chegada = secs;
+  renderGrupos();
+  renderRanking();
+}
+
+function startTick() {
+  tickInterval = setInterval(() => {
+    grupos.forEach(g => {
+      const el = document.getElementById('timer-' + g.id);
+      if (el && state[g.id].startedAt) el.textContent = fmt(elapsed(state[g.id].startedAt));
+    });
+  }, 1000);
+}
+
+function renderRanking() {
+  const chegadas = [];
+  grupos.forEach(g => {
+    g.membros.forEach(m => {
+      const c = state[g.id].membros[m.id].chegada;
+      if (c !== null) chegadas.push({ nome: m.nome, grupo: g.nome, tempo: c });
+    });
+  });
+  chegadas.sort((a,b) => a.tempo - b.tempo);
+
+  const medals = ['🥇','🥈','🥉'];
+  const tbody = document.getElementById('ranking-live');
+  tbody.innerHTML = chegadas.map((c,i) => `
+    <tr>
+      <td style="color:#9ca3af;font-weight:700">${medals[i]??i+1}</td>
+      <td style="color:white;font-weight:600">${c.nome}</td>
+      <td style="color:#9ca3af">${c.grupo}</td>
+      <td style="font-family:monospace;font-weight:700;color:#10b981">${fmt(c.tempo)}</td>
+    </tr>`).join('');
+
+  document.getElementById('chegadas-count').textContent = chegadas.length + ' chegadas';
+  if (chegadas.length > 0) document.getElementById('ranking-box').style.display = 'block';
+}
+
+function atualizaStatusGeral() {
+  const algum = grupos.some(g => state[g.id].startedAt);
+  const sg = document.getElementById('status-geral');
+  if (algum) { sg.style.background = '#064e3b'; sg.style.color = '#6ee7b7'; sg.textContent = '🟢 Corrida em andamento'; }
+}
+
+renderGrupos();
+</script>
+{% endblock %}

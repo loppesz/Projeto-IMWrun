@@ -34,6 +34,10 @@ def login():
 def admin():
     return render_template('admin/dashboard.html')
 
+@app.route('/admin/login')
+def admin_login():
+    return render_template('admin/login.html')
+
 @app.route('/admin/corridas')
 def admin_corridas():
     return render_template('admin/corridas.html')
